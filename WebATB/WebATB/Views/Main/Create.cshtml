@@ -9,7 +9,9 @@
 
     <div class="mb-3">
         <label asp-for="Name" class="form-label"></label>
-        <input asp-for="Name" class="form-control">
+        <input asp-for="Name" class="form-control"> 
+        @* <input type="text"  class="form-control" id="Name" name="Name"> *@
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
 
     <div class="mb-3">

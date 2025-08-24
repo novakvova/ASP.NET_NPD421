@@ -10,9 +10,16 @@ public class CategoryMapper : Profile
     {
         CreateMap<CategoryEntity,CategoryItemModel>()
             .ForMember(x=>x.Image, 
-                opt => opt.MapFrom(x=>x.Image!=null ? $"/images/{x.Image}" : null));
+                opt => opt.MapFrom(x=>string.IsNullOrEmpty(x.Image) ? $"/images/noimage.png" : $"/images/{x.Image}"));
 
         CreateMap<CategoryCreateModel, CategoryEntity>()
             .ForMember(x=>x.Image, opt => opt.Ignore());
+
+        CreateMap<CategoryEntity, CategoryUpdateModel>()
+            .ForMember(x => x.Image,
+                opt => opt.MapFrom(x => string.IsNullOrEmpty(x.Image) ? $"/images/noimage.png" : $"/images/{x.Image}"));
+
+        CreateMap<CategoryUpdateModel, CategoryEntity>()
+           .ForMember(x => x.Image, opt => opt.Ignore()); 
     }
 }

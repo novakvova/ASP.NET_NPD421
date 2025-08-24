@@ -29,6 +29,7 @@
                     @item.Name
                 </td>
                 <td>
+                    <a href="@Url.Action("Update", new { id = item.Id })" class="btn btn-success">Змінити</a>
                     <a href="@Url.Action("Delete", new { id = item.Id })" class="btn btn-danger">Видалити</a>
                 </td>
             </tr>

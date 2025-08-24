@@ -65,11 +65,14 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
     [HttpGet]
     public IActionResult Delete(int id)
     {
-        var category = dbContext.Categories.FirstOrDefault(c => c.Id == id);
+        var category = dbContext.Categories
+            .ProjectTo<CategoryItemModel>(mapper.ConfigurationProvider)
+            .FirstOrDefault(c => c.Id == id);
         if (category == null)
         {
             return NotFound();
         }
+        
         return View(category);
     }
 
@@ -80,6 +83,14 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
         if (category == null)
         {
             return NotFound();
+        }
+        if (category.Image != null)
+        {
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "images", category.Image);
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
         }
         dbContext.Categories.Remove(category);
         dbContext.SaveChanges();

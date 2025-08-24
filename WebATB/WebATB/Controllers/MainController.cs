@@ -1,19 +1,35 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using WebATB.Data;
 using WebATB.Data.Entities;
+using WebATB.Models.Category;
 
 namespace WebATB.Controllers;
 
 //звичайни клас, який наслідує Controller
 
-public class MainController(AppATBDbContext dbContext) : Controller
+public class MainController(AppATBDbContext dbContext, IMapper mapper) : Controller
 {
     //метод контролер - action method
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var list = dbContext.Categories.ToList();
-        return View(list);
+        //var list = dbContext.Categories.ToList();
+
+        //var model = await dbContext.Categories.Select(x => new CategoryItemModel
+        //{
+        //    Id = x.Id,
+        //    Name = x.Name,
+        //    Image = x.Image
+        //}).ToListAsync();
+
+        var model = await dbContext.Categories
+            .ProjectTo<CategoryItemModel>(mapper.ConfigurationProvider)
+            .ToListAsync();
+
+        return View(model);
     }
     //відображаємо сторінку створення категорії
     [HttpGet]
@@ -24,9 +40,23 @@ public class MainController(AppATBDbContext dbContext) : Controller
 
     //обробляємо форму створення категорії
     [HttpPost]
-    public IActionResult Create(CategoryEntity model)
+    public IActionResult Create(CategoryCreateModel model)
     {
-        dbContext.Categories.Add(model);
+        var fileName = string.Empty;
+        if (model.Image != null)
+        {
+            fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.Image.FileName)}";
+            var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
+            //Directory.CreateDirectory(dir);
+            var filePath = Path.Combine(dir, fileName);
+            using var stream = System.IO.File.Create(filePath);
+            model.Image.CopyTo(stream);
+        }
+
+        var entity = mapper.Map<CategoryEntity>(model);
+
+        entity.Image = fileName;
+        dbContext.Categories.Add(entity);
         dbContext.SaveChanges();
 
         return RedirectToAction(nameof(Index));

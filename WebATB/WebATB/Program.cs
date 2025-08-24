@@ -9,6 +9,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<AppATBDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MyConnectionATB")));
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -26,6 +28,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Main}/{action=Index}/{id?}")
     .WithStaticAssets();
+
+var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
+Directory.CreateDirectory(dir);
+//Дозволяємо доступ до файлів в папці images по шляху /images
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(dir),
+    RequestPath = "/images"
+});
 
 
 app.Run();

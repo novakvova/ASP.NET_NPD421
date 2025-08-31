@@ -29,7 +29,9 @@ app.MapControllerRoute(
     pattern: "{controller=Main}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
+var dirName = builder.Configuration.GetValue<string>("ImagesDir") ?? "images";
+
+var dir = Path.Combine(Directory.GetCurrentDirectory(), dirName);
 Directory.CreateDirectory(dir);
 //Дозволяємо доступ до файлів в папці images по шляху /images
 app.UseStaticFiles(new StaticFileOptions

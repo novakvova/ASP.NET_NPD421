@@ -11,4 +11,5 @@ public class AppATBDbContext : DbContext
     }
 
     public DbSet<CategoryEntity> Categories { get; set; }
+    public DbSet<ProductEntity> Products { get; set; }
 }

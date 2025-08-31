@@ -11,6 +11,11 @@ public class ImageService(IConfiguration configuration) : IImageService
         var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
         var dir = Path.Combine(Directory.GetCurrentDirectory(), configuration["ImagesDir"]!);
 
+        if (sizes == null || sizes.Count == 0)
+        {
+            sizes = new List<int> { 256, 512, 1024 };
+        }
+
         Task[] tasks = sizes
             .AsParallel()
             .Select(size =>
@@ -68,13 +73,13 @@ public class ImageService(IConfiguration configuration) : IImageService
         var dirName = configuration.GetValue<string>("ImagesDir") ?? "images";
         var path = Path.Combine(Directory.GetCurrentDirectory(), dirName, $"{size}_{name}");
         using var image = Image.Load(bytes);
-        image.Mutate(async imgContext => {
+        image.Mutate(imgContext => {
             imgContext.Resize(new ResizeOptions
             {
                 Size = new Size(size, size),
                 Mode = ResizeMode.Max
             });
-            await image.SaveAsWebpAsync(path);
         });
+        await image.SaveAsWebpAsync(path);
     }
 }

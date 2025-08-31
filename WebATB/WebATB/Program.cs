@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WebATB.Data;
+using WebATB.Interfaces;
+using WebATB.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,8 @@ builder.Services.AddDbContext<AppATBDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MyConnectionATB")));
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IImageService, ImageService>();
 
 var app = builder.Build();
 

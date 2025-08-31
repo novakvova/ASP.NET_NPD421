@@ -3,15 +3,19 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Threading.Tasks;
 using WebATB.Data;
 using WebATB.Data.Entities;
+using WebATB.Interfaces;
 using WebATB.Models.Category;
 
 namespace WebATB.Controllers;
 
 //звичайни клас, який наслідує Controller
 
-public class MainController(AppATBDbContext dbContext, IMapper mapper) : Controller
+public class MainController(AppATBDbContext dbContext, 
+    IMapper mapper,
+    IImageService imageService) : Controller
 {
     //метод контролер - action method
     public async Task<IActionResult> Index()
@@ -40,7 +44,7 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
 
     //обробляємо форму створення категорії
     [HttpPost]
-    public IActionResult Create(CategoryCreateModel model)
+    public async Task<IActionResult> Create(CategoryCreateModel model)
     {
         var existingCategory = dbContext.Categories.FirstOrDefault(c => c.Name == model.Name);
         if (existingCategory != null)
@@ -53,16 +57,17 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
         {
             return View(model);
         }
-
+        
         var fileName = string.Empty;
         if (model.Image != null)
         {
-            fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.Image.FileName)}";
-            var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
-            //Directory.CreateDirectory(dir);
-            var filePath = Path.Combine(dir, fileName);
-            using var stream = System.IO.File.Create(filePath);
-            model.Image.CopyTo(stream);
+            fileName = await imageService.SaveImageAsync(model.Image);
+            //fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.Image.FileName)}";
+            //var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
+            ////Directory.CreateDirectory(dir);
+            //var filePath = Path.Combine(dir, fileName);
+            //using var stream = System.IO.File.Create(filePath);
+            //model.Image.CopyTo(stream);
         }
 
         var entity = mapper.Map<CategoryEntity>(model);
@@ -88,7 +93,7 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
     }
 
     [HttpPost]
-    public IActionResult Update(CategoryUpdateModel model)
+    public async Task<IActionResult> Update(CategoryUpdateModel model)
     {
         var entity = dbContext.Categories.FirstOrDefault(c => c.Id == model.Id);
         if (entity == null)
@@ -106,29 +111,28 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
 
         if (!ModelState.IsValid) //Якщо модель не валідна, то вертаємося на форму створення
         {
-            model.Image = $"/images/{entity.Image}"; //щоб показати поточне фото 
+            model.Image = $"/images/200_{entity.Image}"; //щоб показати поточне фото 
             return View(model);
         }
 
         var fileName = string.Empty;
         if (model.ImageFile != null)
         {
-            fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.ImageFile.FileName)}";
-            var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
-            //Directory.CreateDirectory(dir);
-            var filePath = Path.Combine(dir, fileName);
-            using var stream = System.IO.File.Create(filePath);
-            model.ImageFile.CopyTo(stream);
+            //fileName = $"{Guid.NewGuid()}{Path.GetExtension(model.ImageFile.FileName)}";
+            //var dir = Path.Combine(Directory.GetCurrentDirectory(), "images");
+            ////Directory.CreateDirectory(dir);
+            //var filePath = Path.Combine(dir, fileName);
+            //using var stream = System.IO.File.Create(filePath);
+            //model.ImageFile.CopyTo(stream);
+
+            fileName = await imageService.SaveImageAsync(model.ImageFile);
         }
 
         if (string.IsNullOrEmpty(fileName) == false) //Якщо завантажено нове фото
         {
             //Видаляємо старе фото
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "images", entity.Image);
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
+            if (!string.IsNullOrEmpty(entity.Image))
+                await imageService.DeleteImageAsync(entity.Image);
             entity.Image = fileName;
         }
 
@@ -155,7 +159,7 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
     }
 
     [HttpPost]
-    public IActionResult Delete(CategoryEntity model)
+    public async Task<IActionResult> Delete(CategoryEntity model)
     {
         var category = dbContext.Categories.FirstOrDefault(c => c.Id == model.Id);
         if (category == null)
@@ -164,11 +168,7 @@ public class MainController(AppATBDbContext dbContext, IMapper mapper) : Control
         }
         if (category.Image != null)
         {
-            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "images", category.Image);
-            if (System.IO.File.Exists(filePath))
-            {
-                System.IO.File.Delete(filePath);
-            }
+            await imageService.DeleteImageAsync(category.Image);
         }
         dbContext.Categories.Remove(category);
         dbContext.SaveChanges();

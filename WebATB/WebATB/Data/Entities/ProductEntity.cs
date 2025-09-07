@@ -15,4 +15,6 @@ public class ProductEntity
     [ForeignKey(nameof(Category))]
     public int CategoryId { get; set; }
     public CategoryEntity? Category { get; set; }
+
+    public virtual ICollection<ProductImageEntity>? ProductImages { get; set; }
 }

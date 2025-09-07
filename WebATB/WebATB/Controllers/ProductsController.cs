@@ -13,7 +13,11 @@ public class ProductsController(AppATBDbContext dbContext,
 {
     public IActionResult Index()
     {
-        return View();
+        var model = dbContext.Products
+            .ProjectTo<ProductItemModel>(mapper.ConfigurationProvider)
+            .ToList();
+
+        return View(model);
     }
 
     [HttpGet]    

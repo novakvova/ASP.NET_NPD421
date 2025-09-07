@@ -35,6 +35,7 @@ public class ProductsController(AppATBDbContext dbContext,
     [HttpPost]
     public IActionResult Create(ProductCreateModel model)
     {
+        //var request = this.Request;
         if(!ModelState.IsValid)
         {
             model.Categories = dbContext.Categories
@@ -45,12 +46,12 @@ public class ProductsController(AppATBDbContext dbContext,
         var entity = mapper.Map<ProductEntity>(model);
         dbContext.Products.Add(entity);
         dbContext.SaveChanges();
-        if(model.Images != null && model.Images.Length > 0)
+        if (model.Images != null && model.Images.Length > 0)
         {
             short priority = 1;
             foreach (var image in model.Images)
             {
-                if(image.Length > 0)
+                if (image.Length > 0)
                 {
                     var imageName = imageService.SaveImageAsync(image).Result;
                     var imageEntity = new ProductImageEntity

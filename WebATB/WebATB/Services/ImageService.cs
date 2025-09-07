@@ -44,6 +44,17 @@ public class ImageService(IConfiguration configuration) : IImageService
         return imageName;
     }
 
+    public async Task<string> SaveImageAsync(string base64)
+    {
+        if(base64.Contains(","))
+        {
+            base64 = base64[(base64.IndexOf(",") + 1)..];
+        }
+        var bytes = Convert.FromBase64String(base64);
+        var imageName = await SaveImageAsync(bytes);
+        return imageName;
+    }
+
     private async Task<string> SaveImageAsync(byte[] bytes)
     {
         string imageName = Guid.NewGuid().ToString() + ".webp";

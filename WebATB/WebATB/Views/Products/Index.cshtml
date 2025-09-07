@@ -28,6 +28,10 @@
                     @item.Id
                 </th>
                 <td>
+                    @foreach(var img in item.ProductImages)
+                    {
+                        <img src="@img" alt="" width="75" class="me-2 mb-2" />
+                    }
                     @* <img src="@item.Image" alt="" width="75" /> *@
                 </td>
                 <td>

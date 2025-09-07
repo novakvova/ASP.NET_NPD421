@@ -20,6 +20,6 @@ public class ProductCreateModel
     //Щоб бачити список, який ми хочемо показати в дропдауні
     public List<SelectItemHelper> Categories { get; set; } = new List<SelectItemHelper>();
 
-    public IFormFile[]? Images { get; set; }
+    public string[]? Images { get; set; }
 
 }

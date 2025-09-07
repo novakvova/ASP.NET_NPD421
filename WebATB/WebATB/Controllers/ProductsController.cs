@@ -3,13 +3,15 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.AspNetCore.Mvc;
 using WebATB.Data;
 using WebATB.Data.Entities;
+using WebATB.Interfaces;
 using WebATB.Models.Helpers;
 using WebATB.Models.Product;
 
 namespace WebATB.Controllers;
 
 public class ProductsController(AppATBDbContext dbContext,
-    IMapper mapper) : Controller
+    IMapper mapper,
+    IImageService imageService) : Controller
 {
     public IActionResult Index()
     {
@@ -43,6 +45,25 @@ public class ProductsController(AppATBDbContext dbContext,
         var entity = mapper.Map<ProductEntity>(model);
         dbContext.Products.Add(entity);
         dbContext.SaveChanges();
+        if(model.Images != null && model.Images.Length > 0)
+        {
+            short priority = 1;
+            foreach (var image in model.Images)
+            {
+                if(image.Length > 0)
+                {
+                    var imageName = imageService.SaveImageAsync(image).Result;
+                    var imageEntity = new ProductImageEntity
+                    {
+                        ProductId = entity.Id,
+                        Priority = priority++,
+                        Name = imageName
+                    };
+                    dbContext.ProductImages.Add(imageEntity);
+                }
+            }
+            dbContext.SaveChanges();
+        }
         return RedirectToAction(nameof(Index));
     }
 }

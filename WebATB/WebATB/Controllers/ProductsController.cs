@@ -67,4 +67,70 @@ public class ProductsController(AppATBDbContext dbContext,
         }
         return RedirectToAction(nameof(Index));
     }
+
+
+    [HttpGet]
+    public IActionResult Update(int id)
+    {
+        var model = dbContext.Products.
+            ProjectTo<ProductUpdateModel>(mapper.ConfigurationProvider)
+            .FirstOrDefault(c => c.Id == id);
+
+        model.Categories = dbContext.Categories
+            .ProjectTo<SelectItemHelper>(mapper.ConfigurationProvider)
+            .ToList();
+
+        return View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Update(ProductUpdateModel model)
+    {
+        var entity = dbContext.Products.FirstOrDefault(c => c.Id == model.Id);
+        if (entity == null)
+            return NotFound();
+
+        if (!ModelState.IsValid)
+        {
+            model.Categories = dbContext.Categories
+                .ProjectTo<SelectItemHelper>(mapper.ConfigurationProvider)
+                .ToList();
+            return View(model);
+        }
+
+        var oldImages = dbContext.ProductImages.Where(c => c.ProductId == model.Id).ToList();
+        if (oldImages.Count > 0)
+        {
+            foreach (var image in oldImages)
+            {
+                await imageService.DeleteImageAsync(image.Name);
+                dbContext.Remove(image);
+            }
+        }
+
+        if (model.Images != null && model.Images.Length > 0)
+        {
+            short priority = 1;
+            foreach (var image in model.Images)
+            {
+                if (image.Length > 0)
+                {
+                    var imageName = await imageService.SaveImageAsync(image);
+                    dbContext.ProductImages.Add(new ProductImageEntity
+                    {
+                        ProductId = entity.Id,
+                        Priority = priority++,
+                        Name = imageName
+                    });
+                }
+            }
+        }
+
+        mapper.Map(model, entity);
+        await dbContext.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
+
+
 }

@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebATB.Data;
+using WebATB.Data.Entities.Idenity;
+using WebATB.Extensions;
 using WebATB.Interfaces;
 using WebATB.Services;
 
@@ -10,6 +13,18 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<AppATBDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MyConnectionATB")));
+
+builder.Services.AddIdentity<UserEntity, RoleEntity>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+    options.Password.RequiredUniqueChars = 1;
+})
+    .AddEntityFrameworkStores<AppATBDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -44,5 +59,6 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/images"
 });
 
+await app.SeedDataAsync();
 
 app.Run();

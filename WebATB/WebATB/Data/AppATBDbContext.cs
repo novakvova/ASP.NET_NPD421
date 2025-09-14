@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using WebATB.Data.Entities;
+using WebATB.Data.Entities.Idenity;
 
 namespace WebATB.Data;
 
-public class AppATBDbContext : DbContext
+public class AppATBDbContext : IdentityDbContext<UserEntity, RoleEntity, int>
 {
     public AppATBDbContext(DbContextOptions<AppATBDbContext> options)
         : base(options)
@@ -13,4 +15,20 @@ public class AppATBDbContext : DbContext
     public DbSet<CategoryEntity> Categories { get; set; }
     public DbSet<ProductEntity> Products { get; set; }
     public DbSet<ProductImageEntity> ProductImages { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        base.OnModelCreating(builder);
+
+        //identity
+        builder.Entity<UserRoleEntity>()
+            .HasOne(ur => ur.User)
+            .WithMany(u => u.UserRoles)
+            .HasForeignKey(ur => ur.UserId);
+
+        builder.Entity<UserRoleEntity>()
+            .HasOne(ur => ur.Role)
+            .WithMany(r => r.UserRoles)
+            .HasForeignKey(ur => ur.RoleId);
+    }
 }

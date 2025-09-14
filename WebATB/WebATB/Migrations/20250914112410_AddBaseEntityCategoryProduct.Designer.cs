@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using WebATB.Data;
@@ -11,9 +12,11 @@ using WebATB.Data;
 namespace WebATB.Migrations
 {
     [DbContext(typeof(AppATBDbContext))]
-    partial class AppATBDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250914112410_AddBaseEntityCategoryProduct")]
+    partial class AddBaseEntityCategoryProduct
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

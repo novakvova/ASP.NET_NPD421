@@ -4,10 +4,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace WebATB.Data.Entities;
 
 [Table("tblCategories")]
-public class CategoryEntity
+public class CategoryEntity : BaseEntity<int>
 {
-    [Key]
-    public int Id { get; set; }
     [Required, StringLength(255)]
     public string Name { get; set; } = string.Empty;
     [StringLength(200)]

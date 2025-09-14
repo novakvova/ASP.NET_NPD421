@@ -16,6 +16,7 @@ public class ProductsController(AppATBDbContext dbContext,
     public IActionResult Index()
     {
         var model = dbContext.Products
+            .Where(p => p.IsDeleted != true)
             .ProjectTo<ProductItemModel>(mapper.ConfigurationProvider)
             .ToList();
 
@@ -132,5 +133,18 @@ public class ProductsController(AppATBDbContext dbContext,
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var category = dbContext.Products.FirstOrDefault(c => c.Id == id);
+        if (category == null)
+        {
+            return NotFound();
+        }
+
+        category.IsDeleted = true;
+        dbContext.SaveChanges();
+        return RedirectToAction(nameof(Index));
+    }
 
 }

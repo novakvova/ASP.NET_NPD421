@@ -48,16 +48,25 @@ app.MapControllerRoute(
     pattern: "{controller=Main}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-var dirName = builder.Configuration.GetValue<string>("ImagesDir") ?? "images";
-
-var dir = Path.Combine(Directory.GetCurrentDirectory(), dirName);
-Directory.CreateDirectory(dir);
-//Дозволяємо доступ до файлів в папці images по шляху /images
-app.UseStaticFiles(new StaticFileOptions
+Dictionary<string, string> imageSizes = new()
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(dir),
-    RequestPath = "/images"
-});
+    { "ImagesDir", "images" },
+    { "AvatarDir", "avatars" },
+};
+
+foreach (var (key, value) in imageSizes)
+{
+    var dirName = builder.Configuration.GetValue<string>(key) ?? value;
+
+    var dir = Path.Combine(Directory.GetCurrentDirectory(), dirName);
+    Directory.CreateDirectory(dir);
+    //Дозволяємо доступ до файлів в папці images по шляху /images
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(dir),
+        RequestPath = $"/{value}"
+    });
+}
 
 await app.SeedDataAsync();
 

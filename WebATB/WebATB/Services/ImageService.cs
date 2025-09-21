@@ -34,7 +34,7 @@ public class ImageService(IConfiguration configuration) : IImageService
         await Task.WhenAll(tasks);
     }
 
-    public async Task<string> SaveImageAsync(IFormFile file)
+    public async Task<string> SaveImageAsync(IFormFile file, string options = "ImagesDir")
     {
         using MemoryStream ms = new();
         await file.CopyToAsync(ms);
@@ -55,7 +55,8 @@ public class ImageService(IConfiguration configuration) : IImageService
         return imageName;
     }
 
-    private async Task<string> SaveImageAsync(byte[] bytes)
+    private async Task<string> SaveImageAsync(byte[] bytes, 
+        string options = "ImagesDir")
     {
         string imageName = Guid.NewGuid().ToString() + ".webp";
         var sizes = configuration.GetRequiredSection("ImageSizes").Get<List<int>>();
@@ -79,9 +80,10 @@ public class ImageService(IConfiguration configuration) : IImageService
     /// <param name="name">назва фото</param>
     /// <param name="size">розмір із яким зберігати</param>
     /// <returns></returns>
-    private async Task SaveImageAsync(Byte[] bytes, string name, int size)
+    private async Task SaveImageAsync(Byte[] bytes, string name, int size, 
+        string options = "ImagesDir")
     {
-        var dirName = configuration.GetValue<string>("ImagesDir") ?? "images";
+        var dirName = configuration.GetValue<string>(options) ?? "images";
         var path = Path.Combine(Directory.GetCurrentDirectory(), dirName, $"{size}_{name}");
         using var image = Image.Load(bytes);
         image.Mutate(imgContext => {

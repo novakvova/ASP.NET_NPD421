@@ -1,4 +1,4 @@
-namespace AspnetCoreMvcFull.Models;
+namespace WebATB.Areas.Admin.Models;
 
 public class ErrorViewModel
 {

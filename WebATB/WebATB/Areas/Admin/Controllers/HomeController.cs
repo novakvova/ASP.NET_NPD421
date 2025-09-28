@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using AspnetCoreMvcFull.Models;
+using WebATB.Areas.Admin.Models;
 
-namespace AspnetCoreMvcFull.Controllers;
+namespace WebATB.Areas.Admin.Controllers;
 
 [Area("Admin")]
 public class HomeController : Controller

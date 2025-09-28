@@ -43,6 +43,18 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+
+
+
+//системв маршрутизації по замовчуванню
+
+
+app.MapAreaControllerRoute(
+    name: "MyAreaAdmin",
+    areaName: "Admin",
+    pattern: "admin/{controller=Home}/{action=Index}/{id?}");
+//.RequireAuthorization("AdminOnly");
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Main}/{action=Index}/{id?}")

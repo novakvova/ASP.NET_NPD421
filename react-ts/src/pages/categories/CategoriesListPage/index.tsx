@@ -38,6 +38,9 @@ const CategoriesListPage = () => {
                         <th scope="col" className="px-6 py-3">
                             Назва
                         </th>
+                        <th scope="col" className="px-6 py-3">
+
+                        </th>
                     </tr>
                     </thead>
                     <tbody>

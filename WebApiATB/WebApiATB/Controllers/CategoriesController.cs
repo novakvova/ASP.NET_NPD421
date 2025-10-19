@@ -91,7 +91,7 @@ public class CategoriesController(AppDbContext appDbContext,
 
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromQuery] int id)
+    public async Task<IActionResult> Delete(int id)
     {
         var entity = await appDbContext.Categories
             .Where(x => !x.IsDeleted)

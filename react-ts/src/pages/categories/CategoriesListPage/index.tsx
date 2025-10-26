@@ -1,27 +1,32 @@
-import {useEffect, useState} from "react";
-import type {ICategoryItem} from "../../../types/category/ICategoryItem.ts";
+// import {useEffect, useState} from "react";
+// import type {ICategoryItem} from "../../../types/category/ICategoryItem.ts";
 import CategoryRow from "./CategoryRow.tsx";
-import api from "../../../api";
+import {useGetCategoriesQuery} from "../../../services/apiCategory.ts";
+// import api from "../../../api";
 
 const CategoriesListPage = () => {
 
-    const [categories, setCategories] = useState<ICategoryItem[]>([]);
+    // const [categories, setCategories] = useState<ICategoryItem[]>([]);
+    //
+    // useEffect(() => {
+    //     requestCategories();
+    // },[]);
+    //
+    // const requestCategories = async () => {
+    //     try {
+    //         const response =
+    //             await api.get<ICategoryItem[]>(`categories`);
+    //         const { data } = response;
+    //         setCategories(data);
+    //     }
+    //     catch (e) {
+    //         console.error("Propblem working requewstCategories", e);
+    //     }
+    // }
 
-    useEffect(() => {
-        requestCategories();
-    },[]);
-
-    const requestCategories = async () => {
-        try {
-            const response =
-                await api.get<ICategoryItem[]>(`categories`);
-            const { data } = response;
-            setCategories(data);
-        }
-        catch (e) {
-            console.error("Propblem working requewstCategories", e);
-        }
-    }
+    const {data: categories, isLoading, error} = useGetCategoriesQuery();
+    console.log("loading", isLoading);
+    console.log("error", error);
 
     return (
         <>
@@ -44,7 +49,7 @@ const CategoriesListPage = () => {
                     </tr>
                     </thead>
                     <tbody>
-                    {categories.map((category) =>
+                    {categories?.map((category) =>
                         <CategoryRow key={category.id} category={category} />
                     )}
                     </tbody>

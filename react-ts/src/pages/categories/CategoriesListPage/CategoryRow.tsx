@@ -1,6 +1,7 @@
 import type {ICategoryItem} from "../../../types/category/ICategoryItem.ts";
 import APP_ENV from "../../../env";
 import DeleteConfirmDialog from "../../../components/DeleteConfirmDialog";
+import {useDeleteCategoryMutation} from "../../../services/apiCategory.ts";
 
 interface Props {
     category: ICategoryItem;
@@ -9,6 +10,16 @@ interface Props {
 const CategoryRow : React.FC<Props> = ({
                                     category,
                                        }) => {
+    const [deleteCategory] = useDeleteCategoryMutation();
+    const handleDelete = async () => {
+        try {
+            await deleteCategory(category.id);
+        }
+        catch (e) {
+            console.error("Problem with delete", e);
+            alert("Problem with delete");
+        }
+    }
     return (
         <tr className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200">
             <td className="px-6 py-4">
@@ -19,7 +30,10 @@ const CategoryRow : React.FC<Props> = ({
                 {category.name}
             </th>
             <th>
-                <DeleteConfirmDialog />
+                <DeleteConfirmDialog
+                    title={`Ви дійсно бажаєте видалити ${category.name}?`}
+                    deleteAction={handleDelete}
+                />
             </th>
         </tr>
     )

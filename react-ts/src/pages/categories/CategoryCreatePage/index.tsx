@@ -1,18 +1,22 @@
 import {useState} from "react";
 import {useNavigate} from "react-router";
-import api from "../../../api";
+// import api from "../../../api";
+import {useCategoryCreateMutation} from "../../../services/apiCategory.ts";
+import type {ICategoryCreate} from "../../../types/category/ICategoryCreate.ts";
 
-interface Props {
-    name: string;
-    image: null | File;
-}
+// interface Props {
+//     name: string;
+//     image: null | File;
+// }
 
 const CategoryCreatePage = () => {
 
-    const [form, setForm] = useState<Props>({
+    const [form, setForm] = useState<ICategoryCreate>({
         name: "",
         image: null,
     });
+
+    const [categoryCreate] = useCategoryCreateMutation();
 
     const navigator = useNavigate();
 
@@ -38,11 +42,12 @@ const CategoryCreatePage = () => {
         e.preventDefault();
         try
         {
-            await api.post(`categories`, form, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            await categoryCreate(form);
+            // await api.post(`categories`, form, {
+            //     headers: {
+            //         "Content-Type": "multipart/form-data",
+            //     },
+            // });
             navigator("/");
         }
         catch (e)

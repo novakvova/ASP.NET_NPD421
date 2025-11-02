@@ -11,7 +11,8 @@ namespace WebApiATB.Controllers
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class AccountController(UserManager<UserEntity> userManager,
-        IImageService imageService, IMapper mapper) : ControllerBase
+        IImageService imageService, IMapper mapper,
+        IJwtTokenService jwtTokenService) : ControllerBase
     {
         [HttpPost]
         public async Task<IActionResult> Register([FromForm] RegisterModel model)
@@ -33,6 +34,21 @@ namespace WebApiATB.Controllers
             }
 
             return BadRequest();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        {
+            var user = await userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            var token = await jwtTokenService.CreateTokenAsync(user);
+            return Ok(new
+            {
+                token,
+            });
         }
     }
 }

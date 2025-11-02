@@ -1,4 +1,5 @@
 using Core.Interfaces;
+using Core.Models.Account;
 using Core.Services;
 using Domain;
 using Domain.Entities.Identity;
@@ -30,8 +31,15 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
 
+var assemblyName = typeof(RegisterModel).Assembly.GetName().Name;
+
 // Додали свагера
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    var fileDoc = $"{assemblyName}.xml";
+    var filePath = Path.Combine(AppContext.BaseDirectory, fileDoc);
+    opt.IncludeXmlComments(filePath);
+});
 
 builder.Services.AddCors();
 
@@ -50,7 +58,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-var dir = builder.Configuration["ImagesDir"];
+var dir = builder.Configuration["ImagesDir"] ?? "";
 string path = Path.Combine(Directory.GetCurrentDirectory(), dir);
 Directory.CreateDirectory(path);
 

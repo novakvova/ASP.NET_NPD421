@@ -3,10 +3,12 @@ using Core.Models.Account;
 using Core.Services;
 using Domain;
 using Domain.Entities.Identity;
+using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using WebApiATB;
+using WebApiATB.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +41,13 @@ builder.Services.AddSwaggerGen(opt =>
     var fileDoc = $"{assemblyName}.xml";
     var filePath = Path.Combine(AppContext.BaseDirectory, fileDoc);
     opt.IncludeXmlComments(filePath);
+});
+
+builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddMvc(options =>
+{
+    options.Filters.Add<ValidationFilter>();
 });
 
 builder.Services.AddCors();

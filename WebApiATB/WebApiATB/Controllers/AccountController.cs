@@ -29,7 +29,11 @@ namespace WebApiATB.Controllers
                 result = await userManager.AddToRoleAsync(user, Roles.User);
                 if (result.Succeeded)
                 {
-                    return Ok();
+                    var token = await jwtTokenService.CreateTokenAsync(user);
+                    return Ok(new
+                    {
+                        token,
+                    });
                 }
             }
 

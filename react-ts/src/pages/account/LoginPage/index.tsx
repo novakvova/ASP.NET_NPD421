@@ -15,9 +15,7 @@ const LoginPage = () => {
 
     const[loginRequest, {isError}] = useLoginMutation();
 
-
-
-    // const navigator = useNavigate();
+    const navigator = useNavigate();
 
     const dispatch = useAppDispatch();
 
@@ -38,7 +36,7 @@ const LoginPage = () => {
             dispatch(login(result.token));
             //localStorage.token = result.token;
 
-            // navigator("/");
+            navigator("/");
         }
         catch(error)
         {

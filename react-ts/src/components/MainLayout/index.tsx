@@ -1,12 +1,12 @@
-import {Link, Outlet, useNavigate} from "react-router";
+import {Link, Outlet} from "react-router";
 import APP_ENV from "../../env";
-import {getUserInfo, logout} from "../../utils/tokenUtil.ts";
+import {useAppDispatch, useAppSelector} from "../../store";
+import {logout} from "../../store/authSlice.ts";
 
 const MainLayout = () => {
 
-    const navigate = useNavigate();
-    const userInfo = getUserInfo();
-
+    const dispatch = useAppDispatch();
+    const {user} = useAppSelector(state => state.auth);
     return (
         <>
             <div className={"p-5 bg-white dark:bg-gray-900 antialiased  min-h-screen"}>
@@ -27,26 +27,25 @@ const MainLayout = () => {
                             {/*<Link to={"/create"} className={""}>Додати категорію</Link>*/}
                         </div>
                     </div>
-                    {userInfo !== null ? (
+                    {user !== null ? (
                         <>
                             <div className="flex items-center">
 
                                 <Link to={"/profile"}>
                                     <div className={"flex items-center gap-2"}>
-                                        <img src={`${APP_ENV.API_IMAGE_SMALL_URL}${userInfo.image}`}
+                                        <img src={`${APP_ENV.API_IMAGE_SMALL_URL}${user.image}`}
                                              className={"w-[40px] h-[40px] rounded-lg"}/>
-                                        <p className={"text-white"}>{userInfo.name}</p>
+                                        <p className={"text-white"}>{user.name}</p>
                                     </div>
                                 </Link>
 
                                 <div className={"mx-4"}>
-                                    <button onClick={() => {
-                                        logout();
-                                        navigate("/")
+                                    <Link to={"/"} onClick={() => {
+                                        dispatch(logout());
                                     }}
                                             className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                                         Вихід
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         </>

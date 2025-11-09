@@ -36,10 +36,10 @@ export const apiAccount = createApi({
                     throw new Error("Помилка перетворення данних");
                 }
             },
-            transformResponse: (response: ILoginResponse) => {
-                localStorage.setItem("token", response.token);
-                return response;
-            },
+            // transformResponse: (response: ILoginResponse) => {
+            //     localStorage.setItem("token", response.token);
+            //     return response;
+            // },
         })
     })
 })

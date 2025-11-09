@@ -24,9 +24,9 @@ const CategoriesListPage = () => {
     //     }
     // }
 
-    const {data: categories, isLoading, error} = useGetCategoriesQuery();
-    console.log("loading", isLoading);
-    console.log("error", error);
+    const {data: categories} = useGetCategoriesQuery();
+    // console.log("loading", isLoading);
+    // console.log("error", error);
 
     return (
         <>

@@ -1,4 +1,5 @@
 import type {IAccount} from "../types/account/IAccount.ts";
+import {jwtDecode} from "jwt-decode";
 
 export function checkLogin(): boolean {
     const token = localStorage.getItem("token");
@@ -12,21 +13,16 @@ export function logout(): void {
 export function getUserInfo(): IAccount | null {
     const token = localStorage.getItem("token");
     if (!token) return null;
+    const user = jwtDecode<IAccount>(token);
+    let roles: string[] = [];
 
-    try {
-        const payloadBase64 = token.split(".")[1];
-        const payloadDecoded = decodeURIComponent(
-            atob(payloadBase64)
-                .split("")
-                .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-                .join("")
-        );
-        const payload = JSON.parse(payloadDecoded);
-
-        const { email, name, image, roles } = payload;
-        return { email, name, image, roles };
-    } catch (e) {
-        console.error("Помилка розшифрування токена:", e);
-        return null;
+    // const rawRoles = decodedToken["roles"];
+    if(typeof user.roles === "string") {
+        roles = [user.roles];
     }
+    else if(Array.isArray(user.roles)) {
+        roles = user.roles;
+    }
+    user.roles = roles;
+    return user;
 }

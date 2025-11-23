@@ -4,16 +4,16 @@ namespace WebApiATB.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForPigController : ControllerBase
+    public class WeatherForFrogController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForPigController> _logger;
+        private readonly ILogger<WeatherForFrogController> _logger;
 
-        public WeatherForPigController(ILogger<WeatherForPigController> logger)
+        public WeatherForFrogController(ILogger<WeatherForFrogController> logger)
         {
             _logger = logger;
         }

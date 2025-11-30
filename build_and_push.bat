@@ -16,5 +16,19 @@ echo Pushing Docker image api to repository...
 docker push novakvova/npd421-api:latest
 
 echo Done ---api---!
+
+echo Changing directory frontend...
+cd ..
+cd react-ts
+
+echo Building Docker image frontend...
+docker build -t front-npd421 .
+
+echo Tagging Docker image api...
+docker tag front-npd421:latest novakvova/front-npd421:latest
+
+echo Pushing Docker image api to repository...
+docker push novakvova/front-npd421:latest
+
 pause
 

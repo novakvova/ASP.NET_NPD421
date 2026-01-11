@@ -15,6 +15,7 @@ namespace WebApiATB.Controllers
         IJwtTokenService jwtTokenService) : ControllerBase
     {
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Register([FromForm] RegisterModel model)
         {
             var user = mapper.Map<UserEntity>(model);

@@ -34,6 +34,7 @@ public class CategoriesController(AppDbContext appDbContext,
     }
 
     [HttpPost]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Create([FromForm] CategoryCreateModel model)
     {
         var entity = mapper.Map<CategoryEntity>(model);
@@ -50,6 +51,7 @@ public class CategoriesController(AppDbContext appDbContext,
     }
 
     [HttpPut]
+    [Consumes("multipart/form-data")]
     public async Task<IActionResult> Update([FromForm] CategoryUpdateModel model)
     {
         var existing = await appDbContext.Categories

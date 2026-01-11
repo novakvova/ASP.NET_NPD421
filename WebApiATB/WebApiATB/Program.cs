@@ -1,4 +1,4 @@
-using Core.Interfaces;
+ï»¿using Core.Interfaces;
 using Core.Models.Account;
 using Core.Services;
 using Domain;
@@ -9,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
 using System.Text;
 using WebApiATB;
 using WebApiATB.Filters;
@@ -37,15 +39,53 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddControllers();
 
-var assemblyName = typeof(RegisterModel).Assembly.GetName().Name;
-
-// Äîäàëè ñâàãåðà
-builder.Services.AddSwaggerGen(opt =>
+// Ð”Ð¾Ð´Ð°Ð»Ð¸ ÑÐ²Ð°Ð³ÐµÑ€Ð°
+builder.Services.AddOpenApi(options =>
 {
-    var fileDoc = $"{assemblyName}.xml";
-    var filePath = Path.Combine(AppContext.BaseDirectory, fileDoc);
-    opt.IncludeXmlComments(filePath);
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
+
+        //Bearer security scheme
+        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        {
+            Name = "Authorization",
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "JWT Authorization header using the Bearer scheme."
+        };
+
+        //Apply globally
+        document.SecurityRequirements =
+        [
+            new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            }
+        ];
+
+        return Task.CompletedTask;
+    });
 });
+//builder.Services.AddSwaggerGen(opt =>
+//{
+//    var fileDoc = $"{assemblyName}.xml";
+//    var filePath = Path.Combine(AppContext.BaseDirectory, fileDoc);
+//    opt.IncludeXmlComments(filePath);
+//});
 
 builder.Services.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -80,13 +120,19 @@ builder.Services.AddAuthentication(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI();
+app.MapOpenApi();
+
+app.UseSwaggerUI(options =>
+{
+    options.SwaggerEndpoint("/openapi/v1.json", "v1");
+});
 
 app.UseCors(u =>
     u.AllowAnyHeader()
         .AllowAnyOrigin()
         .AllowAnyMethod());
+
+app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
